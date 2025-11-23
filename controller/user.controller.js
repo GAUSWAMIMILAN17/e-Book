@@ -1,20 +1,21 @@
-import { User } from "../models/userschema.model";
+import { User } from "../models/userschema.model.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import path from "path"
+import path from "path";
 
 // user signup
 export const register = async (req, res) => {
   try {
-    const { fullname, email, phonenumbeur, password, role } = req.body;
-    if (!fullname || !email || !phonenumbeur || !password || !role) {
+    const { fullname, email, phonenumber, password, role } = req.body;
+    // console.log(req.body)
+    if (!fullname || !email || !phonenumber || !password || !role) {
       return res.status(400).json({
         message: "Missing required fields",
         success: false,
       });
     }
 
-    const user = User.findOne({ email });
+    const user = await User.findOne({ email });
     if (user) {
       return res.status(400).json({
         message: "Email already exists",
@@ -22,12 +23,14 @@ export const register = async (req, res) => {
       });
     }
 
+    //photo upload cloudinary hear
+
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const newUser = new User({
       fullname,
       email,
-      phonenumbeur,
+      phonenumber,
       password: hashedPassword,
       role,
     });
@@ -85,7 +88,7 @@ export const login = async (req, res) => {
     const tokenData = { userId: user._id };
 
     const token = jwt.sign(tokenData, process.env.JWT_SECRET, {
-      expireIn: "1d",
+      expiresIn: "1d",
     });
 
     const sanitizedUser = {
@@ -119,4 +122,73 @@ export const login = async (req, res) => {
   }
 };
 
-// logout 
+// logout
+export const logout = async (req, res) => {
+  try {
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: false,
+      sameSite: "Strict",
+      path: "/",
+    });
+
+    return res.status(200).json({
+      message: "Logged out successfully",
+      success: true,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      message: "Server Error logging out",
+      success: false,
+    });
+  }
+};
+
+// profile update
+
+export const updateProfile = async (req, res) => {
+  try {
+    const { fullname, email, phonenumber, bio, address } = req.body;
+    
+    const userId = req.id;
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(400).json({
+        message: "User Not Found",
+        success: false,
+      });
+    }
+
+
+    if (fullname) user.fullname = fullname;
+    if (email) user.email = email;
+    if (phonenumber) user.phonenumber = phonenumber;
+    if (bio) user.profile.bio = bio;
+    if (address) user.profile.bio = address;
+
+    await user.save();
+
+    const updatedUser = {
+      _id: user._id,
+      fullname: user.fullname,
+      email: user.email,
+      phonenumber: user.phonenumber,
+      role: user.role,
+      profile: user.profile,
+    };
+
+    return res.status(200).json({
+      message: "Profile updated successfully",
+      user: updatedUser,
+      success: true,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      message: "Server Error updating profile",
+      success: false,
+    });
+  }
+};

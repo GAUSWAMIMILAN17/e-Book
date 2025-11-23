@@ -7,7 +7,7 @@ const userSchema = new mongoose.Schema(
       required: true,
     },
     email: { type: String, unique: true, required: true },
-    phonenumbeur: {type: Number, required: true, unique: true},
+    phonenumber: {type: Number, required: true, unique: true},
     password: { type: String, require: true },
     role: { type: String, enum: ["user", "admin"], default: "user", required: true },
     profile: {
@@ -18,7 +18,7 @@ const userSchema = new mongoose.Schema(
         type: String, // URL to profile photo file
         default: "",
       },
-      adress: {
+      address: {
         type: String,
         require: true
       }
