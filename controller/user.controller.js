@@ -1,6 +1,7 @@
 import { User } from "../models/userschema.model";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import path from "path"
 
 // user signup
 export const register = async (req, res) => {
@@ -117,3 +118,5 @@ export const login = async (req, res) => {
     });
   }
 };
+
+// logout 
