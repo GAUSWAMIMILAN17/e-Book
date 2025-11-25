@@ -4,6 +4,8 @@ import cors from "cors"
 import connectDB from "./utils/db.js"
 import userRoute from "./routes/user.routes.js"
 import cookieParser from "cookie-parser"
+import BookRoute from "./routes/books.routes.js"
+import orderRoute from "./routes/order.routes.js"
 
 
 dotenv.config({})
@@ -28,6 +30,8 @@ app.use(cors(corsOptions));
 const PORT = process.env.PORT || 5001;
 
 app.use("/api/user", userRoute)
+app.use("/api/books", BookRoute)
+app.use("/api/order", orderRoute )
 
 app.listen(PORT, ()=> {
     connectDB()

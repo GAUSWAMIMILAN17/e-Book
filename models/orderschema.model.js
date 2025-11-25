@@ -6,11 +6,15 @@ const orderSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "Book"
   }],
+  quantity: {
+    type: Number,
+    default: 1
+  },
   amount: Number,
-  paymentStatus: {
+  status: {
     type: String,
-    enum: ["pending", "paid"],
-    default: "paid"
+    enum: ["pending", "approved", "rejected", "shipped", "delivered"],
+    default: "pending"
   }
 }, { timestamps: true });
 
